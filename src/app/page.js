@@ -37,30 +37,58 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col items-center mt-16 px-4">
-      <h1 className="text-2xl font-bold mb-4">XLIFF Alignment 데모</h1>
-      <form onSubmit={onSubmit} className="flex flex-col gap-4 w-full max-w-xl">
-        <textarea
-          placeholder="원문 텍스트 입력"
-          rows={6}
-          className="border p-2 w-full"
-          value={sourceText}
-          onChange={(e) => setSourceText(e.target.value)}
-        />
-        <textarea
-          placeholder="번역문 텍스트 입력"
-          rows={6}
-          className="border p-2 w-full"
-          value={targetText}
-          onChange={(e) => setTargetText(e.target.value)}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:opacity-50"
-        >
-          {loading ? "처리 중..." : "Align & 다운로드"}
-        </button>
+    <main className="flex flex-wrap justify-center mt-16 px-4 gap-4">
+      <h1 className="w-full text-2xl font-bold text-center mb-4">
+        XLIFF Alignment 데모
+      </h1>
+
+      <form
+        onSubmit={onSubmit}
+        className="flex flex-col items-center gap-4 w-full"
+      >
+        <div className="flex flex-wrap justify-center gap-4 w-full">
+          <textarea
+            placeholder="원문 텍스트 입력"
+            rows={6}
+            className="
+          flex-auto basis-full
+          sm:basis-[min(100%,700px)]
+          max-w-[600px]
+          min-h-[300px]
+          border rounded p-2
+        "
+            value={sourceText}
+            onChange={(e) => setSourceText(e.target.value)}
+          />
+
+          <textarea
+            placeholder="번역문 텍스트 입력"
+            rows={6}
+            className="
+          flex-auto basis-full
+          sm:basis-[min(100%,700px)]
+          max-w-[600px]
+          min-h-[300px]
+          border rounded p-2
+        "
+            value={targetText}
+            onChange={(e) => setTargetText(e.target.value)}
+          />
+        </div>
+
+        <div className="w-full flex justify-center">
+          <button
+            type="submit"
+            disabled={loading}
+            className="
+          bg-[#fa7f3b] text-white font-bold    <!-- Added font-bold here -->
+      py-2 px-6 rounded
+      hover:bg-[#e67330] disabled:opacity-50
+        "
+          >
+            {loading ? "처리 중..." : "Align & 다운로드"}
+          </button>
+        </div>
       </form>
     </main>
   );
