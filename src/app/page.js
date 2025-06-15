@@ -89,7 +89,7 @@ export default function Home() {
             type="submit"
             disabled={loading}
             className="
-          bg-[#fa7f3b] text-white font-bold    <!-- Added font-bold here -->
+          bg-[#fa7f3b] text-white font-bold mt-4
       py-2 px-6 rounded
       hover:bg-[#e67330] disabled:opacity-50
         "
