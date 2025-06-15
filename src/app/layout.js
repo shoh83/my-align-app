@@ -18,7 +18,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="ko">
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        <title>원본 번역문 정렬 및 XLIFF 추출 데모</title>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
