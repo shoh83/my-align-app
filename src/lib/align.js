@@ -89,8 +89,8 @@ export function buildXliff(
   srcArr,
   trgArr,
   mapping,
-  srcLang = "ko",
-  trgLang = "en",
+  srcLang = "und",
+  trgLang = "und",
   sep = " "
 ) {
   const doc = create({ version: "1.0" })

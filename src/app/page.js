@@ -2,9 +2,21 @@
 
 import { useState } from "react";
 
+const LANGUAGES = [
+  { code: "ko", label: "한국어 (ko)" },
+  { code: "en", label: "English (en)" },
+  { code: "ja", label: "日本語 (ja)" },
+  { code: "zh", label: "中文 (zh)" },
+  { code: "fr", label: "Français (fr)" },
+  { code: "es", label: "Español (es)" },
+  // 👇 add more as needed from BCP‑47 common list :contentReference[oaicite:1]{index=1}
+];
+
 export default function Home() {
   const [sourceText, setSourceText] = useState("");
   const [targetText, setTargetText] = useState("");
+  const [srcLang, setSrcLang] = useState("ko");
+  const [trgLang, setTrgLang] = useState("en");
   const [loading, setLoading] = useState(false);
 
   // Feedback form state
@@ -14,13 +26,14 @@ export default function Home() {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!sourceText || !targetText) return alert("두 문장 모두 입력해주세요.");
+    if (!srcLang || !trgLang) return alert("언어를 모두 선택해주세요.");
 
     setLoading(true);
     try {
       const res = await fetch("/api/align", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sourceText, targetText }),
+        body: JSON.stringify({ sourceText, targetText, srcLang, trgLang }),
       });
       if (!res.ok) throw new Error("에러 발생");
 
@@ -28,7 +41,7 @@ export default function Home() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "alignment.xliff";
+      a.download = `alignment_${srcLang}-${trgLang}.xliff`;
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(url);
@@ -57,6 +70,35 @@ export default function Home() {
         onSubmit={onSubmit}
         className="flex flex-col items-center gap-4 w-full"
       >
+        <div className="flex gap-4 w-full max-w-xl">
+          <select
+            value={srcLang}
+            onChange={(e) => setSrcLang(e.target.value)}
+            className="flex-1 border rounded p-2"
+            required
+          >
+            <option value="">원본 언어 선택</option>
+            {LANGUAGES.map(({ code, label }) => (
+              <option key={code} value={code}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={trgLang}
+            onChange={(e) => setTrgLang(e.target.value)}
+            className="flex-1 border rounded p-2"
+            required
+          >
+            <option value="">번역 언어 선택</option>
+            {LANGUAGES.map(({ code, label }) => (
+              <option key={code} value={code}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex flex-wrap justify-center gap-4 w-full">
           <textarea
             placeholder={`원문 텍스트 입력(최대 20000자)\n\n예시: 내가 아직 어리고 여렸을 적에 아버지는 내게 충고 한마디를 해주셨는데, 그 후로 나는 줄곧 그 말씀을 되뇌곤 한다. "누군가를 비판하고 싶어질 때는," 아버지께서는 말씀하셨다. "이 세상 모든 사람이 너와 같은 혜택을 누리며 살아오지 못했다는 것을 기억하거라."`}

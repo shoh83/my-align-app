@@ -17,11 +17,17 @@ export const maxDuration = 600; // 10 minutes
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
-  const { sourceText, targetText } = await req.json();
-  const srcArr = splitText(sourceText);
-  const trgArr = splitText(targetText);
+  const { sourceText, targetText, srcLang, trgLang } = await req.json();
+  const srcArr = splitText(sourceText, srcLang);
+  const trgArr = splitText(targetText, trgLang);
   const { mapping, usage } = await invokeGemini(srcArr, trgArr);
-  const xmlBuffer = buildXliff(srcArr, trgArr, mapping);
+  const xmlBuffer = buildXliff(
+    srcArr,
+    trgArr,
+    mapping,
+    srcLang || "und",
+    trgLang || "und"
+  );
   const xliffHtml = xmlBuffer.toString("utf-8");
 
   await saveAlignment({
