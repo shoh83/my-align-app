@@ -59,7 +59,7 @@ export default function Home() {
       >
         <div className="flex flex-wrap justify-center gap-4 w-full">
           <textarea
-            placeholder="원문 텍스트 입력(최대 20000자)"
+            placeholder={`원문 텍스트 입력(최대 20000자)\n\n예시: 내가 아직 어리고 여렸을 적에 아버지는 내게 충고 한마디를 해주셨는데, 그 후로 나는 줄곧 그 말씀을 되뇌곤 한다. "누군가를 비판하고 싶어질 때는," 아버지께서는 말씀하셨다. "이 세상 모든 사람이 너와 같은 혜택을 누리며 살아오지 못했다는 것을 기억하거라."`}
             rows={6}
             maxLength={20000}
             className="
@@ -74,7 +74,7 @@ export default function Home() {
           />
 
           <textarea
-            placeholder="번역문 텍스트 입력(최대 20000자)"
+            placeholder={`번역문 텍스트 입력(최대 20000자)\n\n예시: In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since. "Whenever you feel like criticizing any one," he told me, " just remember that all the people in this world haven't had the advantages that you've had."`}
             rows={6}
             maxLength={20000}
             className="
