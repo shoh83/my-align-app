@@ -1,11 +1,18 @@
-import segment from "sentencex";
 import { GoogleGenAI } from "@google/genai";
 import { create } from "xmlbuilder2";
 
-// 1. 문장 분할 함수 (sentencex 사용)
-export function splitText(text, lang = "ko") {
-  // lang: 'ko', 'en' 등 언어 코드
-  return segment(lang, text).filter(Boolean);
+// 1. 문장 분할 함수 (Intl.Segmenter 사용, lang이 유효하지 않으면 'und'로 대체)
+export function splitText(text, lang) {
+  // 1.1. lang이 문자열이 아니거나 빈 문자열이면 'und'로 설정
+  const locale = typeof lang === "string" && lang.trim() !== "" ? lang : "und";
+
+  // 1.2. Intl.Segmenter 생성 (유효하지 않은 locale은 런타임 기본으로 대체됨) :contentReference[oaicite:2]{index=2}
+  const segmenter = new Intl.Segmenter(locale, { granularity: "sentence" });
+
+  // 1.3. 문장 분할 및 전처리 (trim + empty 제거) :contentReference[oaicite:3]{index=3}
+  return [...segmenter.segment(text)]
+    .map(({ segment }) => segment.trim())
+    .filter(Boolean);
 }
 
 // 2. Gemini API 호출 함수 (API 키 방식)
@@ -50,12 +57,31 @@ ${JSON.stringify(targetDict)}
     // 필요한 경우 config 옵션 추가 가능
   });
 
-  const jsonStr = response.text
-    .replace(/```json/g, "")
-    .replace(/```/g, "")
-    .trim();
+  const mapping = JSON.parse(
+    response.text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim()
+  );
 
-  return JSON.parse(jsonStr);
+  // Extract usage metadata
+  const usage = response.usageMetadata;
+  const {
+    promptTokenCount,
+    candidatesTokenCount,
+    totalTokenCount,
+    thoughtsTokenCount,
+  } = usage;
+
+  return {
+    mapping,
+    usage: {
+      promptTokenCount,
+      candidatesTokenCount,
+      totalTokenCount,
+      thoughtsTokenCount,
+    },
+  };
 }
 
 // 3. XLIFF 파일 생성 함수

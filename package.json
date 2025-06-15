@@ -11,7 +11,10 @@
   "dependencies": {
     "@ai-sdk/google": "^1.2.19",
     "@google/genai": "^1.5.1",
+    "@neondatabase/serverless": "^1.0.1",
+    "@vercel/postgres": "^0.10.0",
     "next": "15.3.3",
+    "nnsplit": "^0.5.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sentencex": "^0.4.2",

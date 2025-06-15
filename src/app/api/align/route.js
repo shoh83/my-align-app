@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { splitText, invokeGemini, buildXliff } from "@/lib/align";
+import { saveAlignment } from "@/lib/db";
 
 export async function OPTIONS() {
   return new Response(null, {
@@ -16,8 +17,17 @@ export async function POST(req) {
   const { sourceText, targetText } = await req.json();
   const srcArr = splitText(sourceText);
   const trgArr = splitText(targetText);
-  const mapping = await invokeGemini(srcArr, trgArr);
+  const { mapping, usage } = await invokeGemini(srcArr, trgArr);
   const xmlBuffer = buildXliff(srcArr, trgArr, mapping);
+  const xliffHtml = xmlBuffer.toString("utf-8");
+
+  await saveAlignment({
+    source: sourceText,
+    target: targetText,
+    mapping,
+    xliffHtml,
+    usage,
+  });
 
   return new NextResponse(xmlBuffer, {
     status: 200,
