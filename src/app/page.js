@@ -39,8 +39,19 @@ export default function Home() {
   return (
     <main className="flex flex-wrap justify-center mt-16 px-4 gap-4">
       <h1 className="w-full text-2xl font-bold text-center mb-4">
-        XLIFF Alignment 데모
+        원본 번역문 정렬 및 XLIFF 추출 데모
       </h1>
+
+      <p className="w-full text-center text-lg text-gray-600 mb-4 px-2">
+        원문과 번역문을 각각 입력한 후 버튼을 클릭하면 각 세그먼트별로 원문과
+        번역문을 정렬한 결과를 xliff 파일로 다운받을 수 있습니다. (최대 5분
+        소요)
+      </p>
+
+      <p className="w-full text-center text-sm text-gray-600 mb-4 px-2">
+        * 검증된 API를 활용하여 데이터 유출은 최소화했으나 민감한 정보 입력은
+        주의해주세요.
+      </p>
 
       <form
         onSubmit={onSubmit}
@@ -48,13 +59,14 @@ export default function Home() {
       >
         <div className="flex flex-wrap justify-center gap-4 w-full">
           <textarea
-            placeholder="원문 텍스트 입력"
+            placeholder="원문 텍스트 입력(최대 20000자)"
             rows={6}
+            maxLength={20000}
             className="
           flex-auto basis-full
           sm:basis-[min(100%,700px)]
           max-w-[600px]
-          min-h-[300px]
+          min-h-[400px]
           border rounded p-2
         "
             value={sourceText}
@@ -62,13 +74,14 @@ export default function Home() {
           />
 
           <textarea
-            placeholder="번역문 텍스트 입력"
+            placeholder="번역문 텍스트 입력(최대 20000자)"
             rows={6}
+            maxLength={20000}
             className="
           flex-auto basis-full
           sm:basis-[min(100%,700px)]
           max-w-[600px]
-          min-h-[300px]
+          min-h-[400px]
           border rounded p-2
         "
             value={targetText}
@@ -86,7 +99,7 @@ export default function Home() {
       hover:bg-[#e67330] disabled:opacity-50
         "
           >
-            {loading ? "처리 중..." : "Align & 다운로드"}
+            {loading ? "처리 중..." : "입력 & 다운로드"}
           </button>
         </div>
       </form>
