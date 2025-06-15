@@ -48,11 +48,6 @@ export default function Home() {
         소요)
       </p>
 
-      <p className="w-full text-center text-sm text-gray-600 mb-4 px-2">
-        * 검증된 API를 활용하여 데이터 유출은 최소화했으나 민감한 정보 입력은
-        주의해주세요.
-      </p>
-
       <form
         onSubmit={onSubmit}
         className="flex flex-col items-center gap-4 w-full"
@@ -103,6 +98,10 @@ export default function Home() {
           </button>
         </div>
       </form>
+      <p className="w-full text-center text-sm text-gray-600 mt-4 mb-4 px-2">
+        * 검증된 API를 사용하여 데이터 유출 위험은 최소화했으나 민감한 정보
+        입력은 주의해주세요.
+      </p>
     </main>
   );
 }
