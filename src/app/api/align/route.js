@@ -13,6 +13,9 @@ export async function OPTIONS() {
   });
 }
 
+export const maxDuration = 600; // 10 minutes
+export const dynamic = "force-dynamic";
+
 export async function POST(req) {
   const { sourceText, targetText } = await req.json();
   const srcArr = splitText(sourceText);
