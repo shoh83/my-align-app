@@ -30,3 +30,10 @@ export async function saveAlignment({
     )
   `;
 }
+
+export async function saveFeedback({ message }) {
+  await pg`
+    INSERT INTO feedbacks (message)
+    VALUES (${message})
+  `;
+}
