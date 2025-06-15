@@ -59,7 +59,7 @@ export default function Home() {
         원본 번역문 정렬 및 XLIFF 추출 데모
       </h1>
 
-      <p className="w-full text-center text-lg text-gray-600 mb-4 px-2">
+      <p className="w-full text-center text-lg text-gray-600 mb-4 px-2 dark:text-gray-100">
         원문과 번역문을 각각 입력한 후 버튼을 클릭하면 각 세그먼트별로 원문과
         번역문을
         <br />
@@ -145,7 +145,7 @@ export default function Home() {
           </button>
         </div>
       </form>
-      <p className="w-full text-center text-sm text-gray-600 mt-4 mb-4 px-2">
+      <p className="w-full text-center text-sm text-gray-600 mt-4 mb-4 px-2 dark:text-gray-300">
         * 검증된 API를 사용하여 데이터 유출 위험은 최소화했으나 민감한 정보
         입력은 주의해주세요.
         <br />
@@ -187,7 +187,7 @@ export default function Home() {
           <button
             type="submit"
             disabled={fbLoading}
-            className="self-end border bg-white text-[#fa7f3b] font-bold mt-2 py-2 px-4 rounded disabled:opacity-50"
+            className="self-end border text-[#fa7f3b] font-bold mt-2 py-2 px-4 rounded disabled:opacity-50"
           >
             {fbLoading ? "전송 중…" : "피드백 보내기"}
           </button>
