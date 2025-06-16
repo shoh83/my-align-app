@@ -31,6 +31,8 @@ Preserve the order of the keys in the source and target dictionaries.
 Follow the form of a list of lists, where each inner list contains two elements as shown below. 
 Try to keep the inner list as small as possible. Do not include any other text or explanation.
 Make sure you map every key in both source and target dictionary.
+Each key of the source dictionary should appear only once in the mapping.
+Each key of the target dictionary should appear only once in the mapping.
 
 ###--- Format ---###
 
