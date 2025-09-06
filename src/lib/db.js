@@ -15,7 +15,7 @@ export async function saveAlignment({
 }) {
   await pg`
     INSERT INTO alignments
-      (source, target, mapping, csv,
+      (source, target, mapping, xliff_html,
        prompt_token_count, candidates_token_count,
        thoughts_token_count, total_token_count)
     VALUES (
