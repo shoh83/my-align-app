@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { create } from "xmlbuilder2";
+import { stringify } from "csv-stringify/sync";
 
 // 1. 문장 분할 함수 (Intl.Segmenter 사용, lang이 유효하지 않으면 'und'로 대체)
 export function splitText(text, lang) {
@@ -84,6 +85,24 @@ ${JSON.stringify(targetDict)}
       thoughtsTokenCount,
     },
   };
+}
+
+// 3. CSV 파일 생성 함수
+export function buildCsv(srcArr, trgArr, mapping, sep = " ") {
+  // Prepare rows for CSV: [source_text, target_text]
+  const rows = mapping.map(([sIdxs, tIdxs]) => [
+    sIdxs.map((i) => srcArr[i]).join(sep),
+    tIdxs.map((j) => trgArr[j]).join(sep),
+  ]);
+
+  // Add header row
+  const header = [["source", "target"]];
+  const allRows = header.concat(rows);
+
+  // Convert to CSV string
+  const csv = stringify(allRows, { header: false });
+
+  return Buffer.from(csv, "utf-8");
 }
 
 // 3. XLIFF 파일 생성 함수

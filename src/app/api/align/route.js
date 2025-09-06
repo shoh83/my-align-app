@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { splitText, invokeGemini, buildXliff } from "@/lib/align";
+import { splitText, invokeGemini, buildCsv } from "@/lib/align";
 import { saveAlignment } from "@/lib/db";
 
 export async function OPTIONS() {
@@ -21,7 +21,7 @@ export async function POST(req) {
   const srcArr = splitText(sourceText, srcLang);
   const trgArr = splitText(targetText, trgLang);
   const { mapping, usage } = await invokeGemini(srcArr, trgArr);
-  const xmlBuffer = buildXliff(
+  const xmlBuffer = buildCsv(
     srcArr,
     trgArr,
     mapping,
