@@ -161,14 +161,16 @@ export default function Home() {
             if (!feedback.trim()) return alert("피드백을 입력해주세요.");
             setFbLoading(true);
             try {
-              const res = await fetch("/api/feedback", {
+              const res = await fetch("/api/align", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: feedback }),
+                body: JSON.stringify({ sourceText, targetText, srcLang, trgLang }),
               });
-              if (!res.ok) throw new Error("Error");
-              alert(await res.text());
-              setFeedback("");
+
+              if (!res.ok) {
+                const text = await res.text().catch(() => "");
+                throw new Error(text || `HTTP ${res.status}`);
+              }
             } catch {
               alert("피드백 전송 실패");
             }

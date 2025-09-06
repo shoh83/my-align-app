@@ -1,151 +1,59 @@
+// /lib/align.js (발췌)
 import { GoogleGenAI } from "@google/genai";
-import { create } from "xmlbuilder2";
-
-// 1. 문장 분할 함수 (Intl.Segmenter 사용, lang이 유효하지 않으면 'und'로 대체)
-export function splitText(text, lang) {
-  // 1.1. lang이 문자열이 아니거나 빈 문자열이면 'und'로 설정
-  const locale = typeof lang === "string" && lang.trim() !== "" ? lang : "und";
-
-  // 1.2. Intl.Segmenter 생성 (유효하지 않은 locale은 런타임 기본으로 대체됨) :contentReference[oaicite:2]{index=2}
-  const segmenter = new Intl.Segmenter(locale, { granularity: "sentence" });
-
-  // 1.3. 문장 분할 및 전처리 (trim + empty 제거) :contentReference[oaicite:3]{index=3}
-  return [...segmenter.segment(text)]
-    .map(({ segment }) => segment.trim())
-    .filter(Boolean);
-}
-
-// 2. Gemini API 호출 함수 (API 키 방식)
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function invokeGemini(srcArr, trgArr) {
-  const sourceDict = Object.fromEntries(srcArr.map((txt, idx) => [idx, txt]));
-  const targetDict = Object.fromEntries(trgArr.map((txt, idx) => [idx, txt]));
+  const sourceDict = Object.fromEntries(srcArr.map((t, i) => [i, t]));
+  const targetDict = Object.fromEntries(trgArr.map((t, i) => [i, t]));
 
   const prompt = `
-Map the keys of the source dictionary to the keys of the target dictionary. 
-Mapped keys should contain values that have similar meaning in different languages.
-A key in the source dictionary can be mapped to maximum three subsequent keys in the target dictionary, and 
-a key in the target dictionary can be mapped to maximum three subsequent keys in the source dictionary.
-Preserve the order of the keys in the source and target dictionaries.
-Follow the form of a list of lists, where each inner list contains two elements as shown below. 
-Try to keep the inner list as small as possible. Do not include any other text or explanation.
-Make sure you map every key in both source and target dictionary.
-Each key of the source dictionary should appear only once in the mapping.
-Each key of the target dictionary should appear only once in the mapping.
-
-###--- Format ---###
-
-[
-[[0], [0]],
-[[1], [1,2]],
-[[2,3], [3]],
-...
-]
-
-###--- Source dictionary ---###
-
+[... 동일 ...]
 ${JSON.stringify(sourceDict)}
-
-###--- Target dictionary ---###
-
+[...]
 ${JSON.stringify(targetDict)}
-  `.trim();
+`.trim();
 
-  // Gemini API 호출
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-pro-preview-06-05", // 적절한 모델 선택
+  const resp = await ai.models.generateContent({
+    model: "gemini-2.5-pro-preview-06-05",
     contents: prompt,
-    // 필요한 경우 config 옵션 추가 가능
   });
 
-  const mapping = JSON.parse(
-    response.text
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim()
-  );
+  const raw = typeof resp.text === "function" ? resp.text() : resp.text;
+  const cleaned = String(raw || "")
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
 
-  // Extract usage metadata
-  const usage = response.usageMetadata;
-  const {
-    promptTokenCount,
-    candidatesTokenCount,
-    totalTokenCount,
-    thoughtsTokenCount,
-  } = usage;
-
-  return {
-    mapping,
-    usage: {
-      promptTokenCount,
-      candidatesTokenCount,
-      totalTokenCount,
-      thoughtsTokenCount,
-    },
-  };
-}
-
-// 3. CSV 파일 생성 함수 (no external libraries)
-export function buildCsv(srcArr, trgArr, mapping, sep = " ") {
-  // Escape values for CSV (wrap in quotes if needed)
-  function escapeCsv(val) {
-    if (val == null) return "";
-    const str = String(val);
-    // If contains comma, quote or newline → wrap in double quotes and escape quotes
-    if (/[",\n]/.test(str)) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
+  let mapping;
+  try {
+    mapping = JSON.parse(cleaned);
+  } catch {
+    // 대괄호 블록만 추출 재시도
+    const m = cleaned.match(/\[[\s\S]*\]/);
+    if (!m) throw new Error("Failed to parse mapping JSON");
+    mapping = JSON.parse(m[0]);
   }
 
-  // Build rows: [source, target]
+  const usage = resp.usageMetadata || {};
+  return { mapping, usage: {
+    promptTokenCount: usage.promptTokenCount,
+    candidatesTokenCount: usage.candidatesTokenCount,
+    totalTokenCount: usage.totalTokenCount,
+    thoughtsTokenCount: usage.thoughtsTokenCount,
+  }};
+}
+
+// CSV 빌더는 그대로 OK
+export function buildCsv(srcArr, trgArr, mapping, sep = " ") {
+  function escapeCsv(val) {
+    if (val == null) return "";
+    const s = String(val);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }
   const rows = mapping.map(([sIdxs, tIdxs]) => [
     sIdxs.map((i) => srcArr[i]).join(sep),
     tIdxs.map((j) => trgArr[j]).join(sep),
   ]);
-
-  // Add header row
-  const allRows = [["source", "target"], ...rows];
-
-  // Convert to CSV string
-  const csv = allRows.map((row) => row.map(escapeCsv).join(",")).join("\n");
-
+  const all = [["source", "target"], ...rows];
+  const csv = all.map(r => r.map(escapeCsv).join(",")).join("\n");
   return Buffer.from(csv, "utf-8");
-}
-
-
-// 3. XLIFF 파일 생성 함수
-export function buildXliff(
-  srcArr,
-  trgArr,
-  mapping,
-  srcLang = "und",
-  trgLang = "und",
-  sep = " "
-) {
-  const doc = create({ version: "1.0" })
-    .ele("xliff", {
-      version: "2.0",
-      srcLang,
-      trgLang,
-      xmlns: "urn:oasis:names:tc:xliff:document:2.0",
-    })
-    .ele("file", { id: "f1", original: "combined" });
-
-  mapping.forEach(([sIdxs, tIdxs], idx) => {
-    doc
-      .ele("unit", { id: idx + 1 })
-      .ele("segment", { id: idx + 1 })
-      .ele("source")
-      .txt(sIdxs.map((i) => srcArr[i]).join(sep))
-      .up()
-      .ele("target")
-      .txt(tIdxs.map((j) => trgArr[j]).join(sep))
-      .up()
-      .up();
-  });
-
-  const xml = doc.end({ prettyPrint: true });
-  return Buffer.from(xml, "utf-8");
 }
