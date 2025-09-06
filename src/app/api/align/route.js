@@ -38,7 +38,7 @@ export async function POST(req) {
     usage,
   });
 
-  return new NextResponse(xmlBuffer, {
+  return new NextResponse(csvBuffer, {
     status: 200,
     headers: {
       "Content-Disposition": 'attachment; filename="alignment.csv"',
