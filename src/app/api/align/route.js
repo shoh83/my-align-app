@@ -21,27 +21,27 @@ export async function POST(req) {
   const srcArr = splitText(sourceText, srcLang);
   const trgArr = splitText(targetText, trgLang);
   const { mapping, usage } = await invokeGemini(srcArr, trgArr);
-  const xmlBuffer = buildCsv(
+  const csvBuffer = buildCsv(
     srcArr,
     trgArr,
     mapping,
     srcLang || "und",
     trgLang || "und"
   );
-  const xliffHtml = xmlBuffer.toString("utf-8");
+  const csv = csvBuffer.toString("utf-8");
 
   await saveAlignment({
     source: sourceText,
     target: targetText,
     mapping,
-    xliffHtml,
+    csv,
     usage,
   });
 
   return new NextResponse(xmlBuffer, {
     status: 200,
     headers: {
-      "Content-Disposition": 'attachment; filename="alignment.xliff"',
+      "Content-Disposition": 'attachment; filename="alignment.csv"',
       "Content-Type": "application/xml",
     },
   });

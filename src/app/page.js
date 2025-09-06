@@ -41,7 +41,7 @@ export default function Home() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `alignment_${srcLang}-${trgLang}.xliff`;
+      a.download = `alignment_${srcLang}-${trgLang}.csv`;
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(url);
@@ -56,14 +56,14 @@ export default function Home() {
   return (
     <main className="flex flex-wrap justify-center mt-16 px-4 gap-4">
       <h1 className="w-full text-2xl font-bold text-center mb-4">
-        원본 번역문 정렬 및 XLIFF 추출 데모
+        원본 번역문 정렬 및 csv 추출 데모
       </h1>
 
       <p className="w-full text-center text-lg text-gray-600 mb-4 px-2 dark:text-gray-100">
         원문과 번역문을 각각 입력한 후 버튼을 클릭하면 각 세그먼트별로 원문과
         번역문을
         <br />
-        정렬한 결과를 xliff 파일로 다운받을 수 있습니다. (최대 5분 소요)
+        정렬한 결과를 csv 파일로 다운받을 수 있습니다. (최대 5분 소요)
       </p>
 
       <form
